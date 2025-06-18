@@ -1,0 +1,77 @@
+﻿@model ToDoModel
+
+@{
+    var completed = Model.IsCompleted;
+    var cardClass = completed ? "card mb-3 border-success bg-light text-muted" : "card mb-3";
+    var textDecoration = completed ? "text-decoration-line-through" : "";
+}
+
+<div class="@cardClass" id="@($"item-{Model.Id}")">
+    <div class="card-body">
+
+
+        @if(!Model.inEditMode){
+        <h5 class="card-title @textDecoration">@Model.Title</h5>
+        <p class="card-text @textDecoration">@Model.Description</p>
+        <p>Created at @Model.CreationTime</p>
+        <p>DeadLine at @Model.DeadLineTime</p>
+        }
+
+
+        @if (!completed)
+        {
+            if (Model.inEditMode)
+            {
+                <form asp-action="Update" asp-controller="ToDo" method="post">
+                    <input type="hidden" asp-for="Id" value="@Model.Id" />
+                    <h5 class="card-title">
+                        <input type="text" asp-for="Title" value="@Model.Title" placeholder="Enter title"/>
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </h5>
+                    <p class="card-text">
+                        <input type="text" asp-for="Description" value="@Model.Description" placeholder="Enter Description"/>
+                    </p>
+                    <p>DeadLine</p>
+                    <p><input type="datetime-local" asp-for="DeadLineTime" value="@Model.DeadLineTime!.Value.ToString("yyyy-MM-ddTHH:mm")"  min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" /></p>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </form>
+
+            }else
+            {
+                <p class="card-text">
+                    <small class="text-muted estimated-time" data-deadline="@Model.DeadLineTime!.Value.ToString("yyyy-MM-ddTHH:mm:ss")">
+                    </small>
+                </p>
+                <a href="@Url.Action("EnterEditMode", "ToDo", new  ToDoModel{ Id = Model.Id, CreationTime= Model.CreationTime,IsCompleted = Model.IsCompleted,Description = Model.Description, DeadLineTime = Model.DeadLineTime, Title = Model.Title})" class="btn btn-primary">Edit</a>
+                <a href="@Url.Action("Delete", "ToDo", new { id = Model.Id })" class="btn btn-danger">Delete</a>
+                <a href="@Url.Action("SetCompleted", "ToDo", new ToDoModel { Id = Model.Id, CreationTime = Model.CreationTime, IsCompleted = Model.IsCompleted, Description = Model.Description, DeadLineTime = Model.DeadLineTime, Title = Model.Title })" class="btn btn-secondary">Set as completed</a>
+            }
+        }
+        else
+        {
+            var duration = (Model.CompletionTime - Model.CreationTime)!.Value;
+
+            string display;
+            if (duration.TotalSeconds < 60)
+                display = $"{duration.Seconds} seconds";
+            else if (duration.TotalMinutes < 60)
+                display = $"{duration.Minutes} minutes";
+            else if (duration.TotalHours < 24)
+                display = $"{(int)duration.TotalHours} hours";
+            else
+                display = $"{(int)duration.TotalDays} days";
+
+            <p>Completed at @Model.CompletionTime</p>
+
+            <p class="card-text">
+                <small class="text-muted">
+                    Duo Time: @display
+                </small>
+            </p>
+            <a href="@Url.Action("Delete", "ToDo", new { id = Model.Id })" class="btn btn-danger">Delete</a>
+            <a href="@Url.Action("SetUnCompleted", "ToDo", new ToDoModel { Id = Model.Id, CreationTime = Model.CreationTime, IsCompleted = Model.IsCompleted, Description = Model.Description, DeadLineTime = Model.DeadLineTime, Title = Model.Title })" class="btn btn-secondary">Set as uncompleted</a>
+            <span class="badge bg-success">Completed</span>
+
+        }
+    </div>
+</div>

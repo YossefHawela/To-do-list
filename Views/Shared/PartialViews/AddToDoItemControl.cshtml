@@ -1,0 +1,20 @@
+﻿@model ToDoModel
+
+<form asp-action="Add" asp-controller="ToDo" method="post" class="card mb-3">
+    <input type="hidden" asp-for="Id" value="@Guid.NewGuid()" />
+
+    <div class="card-body">
+        <h5 class="card-title">
+            <input type="text" required pattern=".*\S.*" asp-for="Title" placeholder="Enter title" />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </h5>
+        <p class="card-text">
+            <input type="text" required pattern=".*\S.*" asp-for="Description" placeholder="Enter Description" />
+        </p>
+        <p>DeadLine</p>
+        <p>
+            <input type="datetime-local" placeholder="Enter deadline" asp-for="DeadLineTime" min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+        </p>
+        <button type="submit" class="btn btn-primary">Add</button>
+    </div>
+</form>
