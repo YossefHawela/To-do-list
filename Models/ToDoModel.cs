@@ -1,4 +1,6 @@
-﻿namespace ToDoList.Models
+﻿using System.Security.Claims;
+
+namespace ToDoList.Models
 {
     public class ToDoModel
     {
@@ -15,6 +17,10 @@
 
         public DateTime? DeadLineTime { get; set; }
 
+        public Guid UserId { get; set; }
+
         public bool inEditMode { get; set; } = false;
+
+
     }
 }

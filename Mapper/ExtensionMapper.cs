@@ -1,7 +1,8 @@
-﻿using System.Collections.ObjectModel;
+﻿using BCrypt.Net;
+using System.Collections.ObjectModel;
+using System.Security.Claims;
 using ToDoList.DTO;
 using ToDoList.Models;
-using BCrypt.Net;
 
 
 namespace ToDoList.Mapper
@@ -16,9 +17,9 @@ namespace ToDoList.Mapper
                 Title = item.Title,
                 Description = item.Description,
                 IsCompleted = item.IsCompleted,
-                CreationTime = item.creationTime,
-                DeadLineTime = item.deadLineTime,
-                CompletionTime = item.completionTime
+                CreationTime = item.CreationTime,
+                DeadLineTime = item.DeadLineTime,
+                CompletionTime = item.CompletionTime
             };
         }
         public static ToDoList.DTO.ToDoItem ToDto(this ToDoList.Models.ToDoModel model)
@@ -29,9 +30,10 @@ namespace ToDoList.Mapper
                 Title = model.Title,
                 Description = model.Description,
                 IsCompleted = model.IsCompleted,
-                creationTime = model.CreationTime ?? DateTime.Now,
-                deadLineTime = model.DeadLineTime ?? DateTime.Now.AddDays(1), // Default to one day after creation,
-                completionTime = model.CompletionTime
+                CreationTime = model.CreationTime ?? DateTime.Now,
+                DeadLineTime = model.DeadLineTime ?? DateTime.Now.AddDays(1), // Default to one day after creation,
+                CompletionTime = model.CompletionTime,
+                UserId = model.UserId
             };
         }
 
@@ -125,7 +127,7 @@ namespace ToDoList.Mapper
         {
             return new ToDoList.Models.UserAccountModel
             {
-                ID = dto.ID,
+                ID = dto.Id,
                 UserName = dto.UserName,
                 Email = dto.Email,
             };

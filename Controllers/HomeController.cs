@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.WebSockets;
+using System.Security.Claims;
 using ToDoList.Data;
 using ToDoList.DTO;
 using ToDoList.Models;
@@ -28,7 +29,10 @@ namespace ToDoList.Controllers
 
         public IActionResult Index()
         {
-            var ToDoModelCollection = _dataConnector.ToDoItems.ToModelCollection();
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var ToDoModelCollection = _dataConnector.GetToDoItemsByUserId(userId).OrderBy(tdi=>tdi.CreationTime)
+                .ToModelCollection();
 
             var ToDoModelsInEditMode = _uiDataSorage.ToDoItemsInEditMode.ToModelCollection();
 

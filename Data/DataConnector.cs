@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using ToDoList.DTO;
 
 namespace ToDoList.Data
@@ -8,12 +9,13 @@ namespace ToDoList.Data
 
         private readonly ToDoDataContext _context;
 
-   
         public IEnumerable<ToDoItem> ToDoItems
         {
             get
             {
+
                 return _context.toDoItems;
+                           
             }
         }
 
@@ -23,6 +25,15 @@ namespace ToDoList.Data
             _context = context;
         }
 
+
+        public IEnumerable<ToDoItem> GetToDoItemsByUserId(Guid userId)
+        {
+            if (userId == Guid.Empty)
+            {
+                throw new ArgumentException("User ID cannot be empty.", nameof(userId));
+            }
+            return _context.toDoItems.Where(item => item.UserId == userId);
+        }
         public void Update(ToDoItem toDoItem)
         {
             if (toDoItem == null)
@@ -37,8 +48,8 @@ namespace ToDoList.Data
                 existingItem.Title = toDoItem.Title;
                 existingItem.Description = toDoItem.Description;
                 existingItem.IsCompleted = toDoItem.IsCompleted;
-                existingItem.deadLineTime = toDoItem.deadLineTime;
-                existingItem.completionTime = toDoItem.completionTime;
+                existingItem.DeadLineTime = toDoItem.DeadLineTime;
+                existingItem.CompletionTime = toDoItem.CompletionTime;
 
                 _context.SaveChanges();
             }

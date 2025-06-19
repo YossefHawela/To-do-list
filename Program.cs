@@ -19,6 +19,8 @@ builder.Services.AddAuthentication("ToDoAuthenCookie")
         options.LogoutPath = "/Account/Logout"; // Set the logout path
         options.ReturnUrlParameter = "returnUrl"; // Set the return URL parameter name
     });
+
+
 builder.Services.AddDbContext<ToDoDataContext>(conf =>
 {
     conf.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));

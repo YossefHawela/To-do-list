@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using ToDoList.Data;
 using ToDoList.Mapper;
 using ToDoList.Models;
@@ -24,6 +25,10 @@ namespace ToDoList.Controllers
         public IActionResult Add(ToDoModel toDoModel)
         {
             toDoModel.CreationTime = DateTime.Now;
+
+            string? userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            toDoModel.UserId = Guid.Parse(userIdStr!);
 
             _dataConnector.Add(toDoModel.ToDto());
 
