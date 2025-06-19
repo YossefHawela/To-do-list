@@ -1,24 +1,27 @@
 ﻿@model LoginAccountModel
-@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
 
-<form asp-action="Login" method="post" role="form" class="form-horizontal">
-
-    <h2>Login</h2>
+<form asp-action="Login" method="post" class="card shadow-sm p-4 mx-auto" style="max-width: 400px;">
+    <h2 class="mb-3 text-center">Login</h2>
     <hr />
-    <div asp-validation-summary="All" class="text-danger"></div>
-    <div class="form-group">
-        <label asp-for="UserNameOrEmail" class="control-label"></label>
+
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label asp-for="UserNameOrEmail" class="form-label"></label>
         <input asp-for="UserNameOrEmail" class="form-control" />
-        <span asp-validation-for="UserNameOrEmail" class="text-danger"></span>
-        <label asp-for="Password" class="control-label"></label>
-        <input asp-for="Password" type="password" class="form-control" />
-        <span asp-validation-for="Password" class="text-danger d-block"></span>
+        <span asp-validation-for="UserNameOrEmail" class="text-danger small"></span>
     </div>
-    <label class="col-form-label">Don't have an account?!</label>
-    <a asp-action="Register" class="btn btn-link ">Register</a>
-    <button type="submit" class="btn btn-primary d-block">Login</button>
+
+    <div class="mb-3">
+        <label asp-for="Password" class="form-label"></label>
+        <input asp-for="Password" type="password" class="form-control" />
+        <span asp-validation-for="Password" class="text-danger small"></span>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="text-muted small">Don't have an account?</span>
+        <a asp-action="Register" class="btn btn-link p-0">Register</a>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">Login</button>
 </form>

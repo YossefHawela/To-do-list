@@ -2,76 +2,92 @@
 
 @{
     var completed = Model.IsCompleted;
-    var cardClass = completed ? "card mb-3 border-success bg-light text-muted" : "card mb-3";
+    var cardClass = completed ? "card mb-4 border-0 bg-light text-muted position-relative" : "card mb-4 border-0 shadow-sm position-relative";
     var textDecoration = completed ? "text-decoration-line-through" : "";
+    var deadlineStr = Model.DeadLineTime?.ToString("yyyy-MM-ddTHH:mm");
+    var isEditing = Model.inEditMode && !completed;
 }
 
-<div class="@cardClass" id="@($"item-{Model.Id}")">
+<div class="@cardClass" id="item-@Model.Id">
     <div class="card-body">
 
+        <div class="d-flex justify-content-between align-items-start mb-2">
+            <h5 class="card-title fw-semibold @textDecoration mb-1">@Model.Title</h5>
+            @if (completed)
+            {
+                <span class="badge bg-success">Completed</span>
+            }
+            else if (Model.inEditMode)
+            {
+                <span class="badge bg-info text-dark">Editing</span>
+            }
+            else
+            {
+                <span class="badge bg-warning text-dark">Pending</span>
+            }
+        </div>
 
-        @if(!Model.inEditMode){
-        <h5 class="card-title @textDecoration">@Model.Title</h5>
-        <p class="card-text @textDecoration">@Model.Description</p>
-        <p>Created at @Model.CreationTime</p>
-        <p>DeadLine at @Model.DeadLineTime</p>
+        @if (!isEditing)
+        {
+            <p class="card-text @textDecoration">@Model.Description</p>
+            <p class="text-muted mb-2">
+                <small>Created: @Model.CreationTime</small><br />
+                <small>Deadline: @Model.DeadLineTime</small>
+            </p>
         }
 
-
-        @if (!completed)
+        @if (isEditing)
         {
-            if (Model.inEditMode)
-            {
-                <form asp-action="Update" asp-controller="ToDo" method="post">
-                    <input type="hidden" asp-for="Id" value="@Model.Id" />
-                    <h5 class="card-title">
-                        <input type="text" asp-for="Title" value="@Model.Title" placeholder="Enter title"/>
-                        <span asp-validation-for="Title" class="text-danger"></span>
-                    </h5>
-                    <p class="card-text">
-                        <input type="text" asp-for="Description" value="@Model.Description" placeholder="Enter Description"/>
-                    </p>
-                    <p>DeadLine</p>
-                    <p><input type="datetime-local" asp-for="DeadLineTime" value="@Model.DeadLineTime!.Value.ToString("yyyy-MM-ddTHH:mm")"  min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" /></p>
-                    <button type="submit" class="btn btn-primary">Save</button>
-                </form>
+            <form asp-action="Update" asp-controller="ToDo" method="post" class="mt-3">
+                <input type="hidden" asp-for="Id" />
 
-            }else
-            {
-                <p class="card-text">
-                    <small class="text-muted estimated-time" data-deadline="@Model.DeadLineTime!.Value.ToString("yyyy-MM-ddTHH:mm:ss")">
-                    </small>
-                </p>
-                <a href="@Url.Action("EnterEditMode", "ToDo", new  ToDoModel{ Id = Model.Id, CreationTime= Model.CreationTime,IsCompleted = Model.IsCompleted,Description = Model.Description, DeadLineTime = Model.DeadLineTime, Title = Model.Title})" class="btn btn-primary">Edit</a>
-                <a href="@Url.Action("Delete", "ToDo", new { id = Model.Id })" class="btn btn-danger">Delete</a>
-                <a href="@Url.Action("SetCompleted", "ToDo", new ToDoModel { Id = Model.Id, CreationTime = Model.CreationTime, IsCompleted = Model.IsCompleted, Description = Model.Description, DeadLineTime = Model.DeadLineTime, Title = Model.Title })" class="btn btn-secondary">Set as completed</a>
-            }
+                <div class="mb-3">
+                    <input asp-for="Title" class="form-control" placeholder="Title" />
+                    <span asp-validation-for="Title" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <input asp-for="Description" class="form-control" placeholder="Description" />
+                </div>
+
+                <div class="mb-3">
+                    <input type="datetime-local" asp-for="DeadLineTime" class="form-control"
+                           min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")"
+                           value="@deadlineStr" />
+                </div>
+
+                <button type="submit" class="btn btn-success w-100">Save</button>
+            </form>
+        }
+        else if (!completed)
+        {
+            <p class="card-text">
+                <small class="text-muted estimated-time" data-deadline="@Model.DeadLineTime?.ToString("yyyy-MM-ddTHH:mm:ss")"></small>
+            </p>
+
+            <div class="d-flex gap-2 flex-wrap mt-2">
+                <a asp-action="EnterEditMode" asp-controller="ToDo" asp-route-id="@Model.Id" class="btn btn-outline-primary">Edit</a>
+                <a asp-action="Delete" asp-controller="ToDo" asp-route-id="@Model.Id" class="btn btn-outline-danger">Delete</a>
+                <a asp-action="SetCompleted" asp-controller="ToDo" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Set as completed</a>
+            </div>
         }
         else
         {
             var duration = (Model.CompletionTime - Model.CreationTime)!.Value;
+            var durationStr = duration.TotalSeconds < 60 ? $"{duration.Seconds} seconds"
+                            : duration.TotalMinutes < 60 ? $"{duration.Minutes} minutes"
+                            : duration.TotalHours < 24 ? $"{(int)duration.TotalHours} hours"
+                            : $"{(int)duration.TotalDays} days";
 
-            string display;
-            if (duration.TotalSeconds < 60)
-                display = $"{duration.Seconds} seconds";
-            else if (duration.TotalMinutes < 60)
-                display = $"{duration.Minutes} minutes";
-            else if (duration.TotalHours < 24)
-                display = $"{(int)duration.TotalHours} hours";
-            else
-                display = $"{(int)duration.TotalDays} days";
-
-            <p>Completed at @Model.CompletionTime</p>
-
-            <p class="card-text">
-                <small class="text-muted">
-                    Duo Time: @display
-                </small>
+            <p class="text-muted mt-3 mb-1">
+                <small>Completed: @Model.CompletionTime</small><br />
+                <small>Duo Time: @durationStr</small>
             </p>
-            <a href="@Url.Action("Delete", "ToDo", new { id = Model.Id })" class="btn btn-danger">Delete</a>
-            <a href="@Url.Action("SetUnCompleted", "ToDo", new ToDoModel { Id = Model.Id, CreationTime = Model.CreationTime, IsCompleted = Model.IsCompleted, Description = Model.Description, DeadLineTime = Model.DeadLineTime, Title = Model.Title })" class="btn btn-secondary">Set as uncompleted</a>
-            <span class="badge bg-success">Completed</span>
 
+            <div class="d-flex gap-2 flex-wrap mt-2">
+                <a asp-action="Delete" asp-controller="ToDo" asp-route-id="@Model.Id" class="btn btn-outline-danger">Delete</a>
+                <a asp-action="SetUnCompleted" asp-controller="ToDo" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Set as uncompleted</a>
+            </div>
         }
     </div>
 </div>
