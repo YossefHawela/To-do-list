@@ -13,6 +13,7 @@ namespace ToDoList.Data
 
 
         public DbSet<ToDoItem> toDoItems { get; set; }
+        public DbSet<UserAccount> userAccounts { get; set; }
 
     }
 }

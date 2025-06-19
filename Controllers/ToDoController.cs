@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ToDoList.Data;
 using ToDoList.Mapper;
 using ToDoList.Models;
@@ -18,6 +19,8 @@ namespace ToDoList.Controllers
 
 
         [HttpPost]
+        [Authorize(AuthenticationSchemes = "ToDoAuthenCookie")]
+
         public IActionResult Add(ToDoModel toDoModel)
         {
             toDoModel.CreationTime = DateTime.Now;
@@ -26,6 +29,8 @@ namespace ToDoList.Controllers
 
             return RedirectToAction("Index", "Home", null);
         }
+
+        [Authorize(AuthenticationSchemes = "ToDoAuthenCookie")]
 
         public IActionResult SetCompleted(ToDoModel toDoModel)
         {
@@ -40,12 +45,16 @@ namespace ToDoList.Controllers
         }
 
 
+        [Authorize(AuthenticationSchemes = "ToDoAuthenCookie")]
         public IActionResult SetUnCompleted(ToDoModel toDoModel)
         {
             toDoModel.IsCompleted = false;
             _dataConnector.Update(toDoModel.ToDto());
             return RedirectToAction("Index", "Home", null);
         }
+
+
+        [Authorize(AuthenticationSchemes = "ToDoAuthenCookie")]
 
         public IActionResult Delete(Guid id)
         {
@@ -56,6 +65,9 @@ namespace ToDoList.Controllers
             _dataConnector.Delete(id);
             return RedirectToAction("Index", "Home", null);
         }
+
+        [Authorize(AuthenticationSchemes = "ToDoAuthenCookie")]
+            
         public IActionResult EnterEditMode(ToDoModel toDoModel)
         {
 
@@ -66,6 +78,8 @@ namespace ToDoList.Controllers
         }
 
         [HttpPost]
+        [Authorize(AuthenticationSchemes = "ToDoAuthenCookie")]
+
         public IActionResult Update(ToDoModel toDoModel)
         {
 

@@ -1,5 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using ToDoList.DTO;
+using ToDoList.Models;
+using BCrypt.Net;
+
 
 namespace ToDoList.Mapper
 {
@@ -70,6 +73,62 @@ namespace ToDoList.Mapper
                 items.Add(model.ToDto());
             }
             return items;
+        }
+
+        public static UserAccount ToUserDTO(this ToDoList.Models.RegisterAccountModel model,bool isPasswordHashed = true)
+        {
+
+            // hash the password before saving it to the database
+
+            DateTime creationTime = DateTime.UtcNow;
+
+            var hashedPassword = model.Password; // Default to the plain password if hashing is not required
+
+            if (isPasswordHashed)
+            {
+                 hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.Password); // Generates salt + hashes
+
+            }
+
+
+
+
+            return new UserAccount
+            {
+                UserName = model.UserName,
+                Password = hashedPassword,
+                Email = model.Email,
+                CreatedAt = creationTime
+            };
+        }
+
+        public static LoginAccountModel ValidatePassword(this LoginAccountModel LoginModel,UserAccount userAccount,bool isPasswordHashed = true)
+        {
+
+            bool isValid = LoginModel.Password == userAccount.Password;
+
+            if (userAccount != null && !string.IsNullOrEmpty(userAccount.Password) && !string.IsNullOrEmpty(LoginModel.Password)&&isPasswordHashed)
+            {
+
+                isValid = BCrypt.Net.BCrypt.Verify(LoginModel.Password,userAccount.Password);
+            }
+
+
+            return new LoginAccountModel
+            {
+                UserNameOrEmail = LoginModel.UserNameOrEmail,
+                Password = LoginModel.Password,
+                isValid = isValid
+            };
+        }
+        public static ToDoList.Models.UserAccountModel ToUserModel(this UserAccount dto)
+        {
+            return new ToDoList.Models.UserAccountModel
+            {
+                ID = dto.ID,
+                UserName = dto.UserName,
+                Email = dto.Email,
+            };
         }
     }
 }

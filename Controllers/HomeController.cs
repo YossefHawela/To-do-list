@@ -1,11 +1,12 @@
-using System.Diagnostics;
-using System.Net.WebSockets;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
+using System.Linq;
+using System.Net.WebSockets;
 using ToDoList.Data;
+using ToDoList.DTO;
 using ToDoList.Models;
 using static ToDoList.Mapper.ExtensionMapper;
-using System.Linq;
-using ToDoList.DTO;
 
 namespace ToDoList.Controllers
 {
@@ -21,6 +22,9 @@ namespace ToDoList.Controllers
             _dataConnector = dataConnector;
             _uiDataSorage = uIDataSorage;
         }
+
+
+        [Authorize(AuthenticationSchemes = "ToDoAuthenCookie")]
 
         public IActionResult Index()
         {
@@ -46,10 +50,15 @@ namespace ToDoList.Controllers
             return View(ToDoModelCollection);
         }
 
+
+        [Authorize(AuthenticationSchemes = "ToDoAuthenCookie")]
+
         public IActionResult Privacy()
         {
             return View();
         }
+
+        [Authorize(AuthenticationSchemes = "ToDoAuthenCookie")]
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
